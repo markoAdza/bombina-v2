@@ -1,0 +1,283 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Button from '../components/Button.astro';
+import Marquee from '../components/Marquee.astro';
+import { copy } from '../i18n/copy';
+import { tx, type Lang } from '../i18n/utils';
+import { photos, ig } from '../data/images';
+import { site, phoneFor } from '../data/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = copy[lang];
+const p = c.cateringPage;
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent(p.mailSubject)}&body=${encodeURIComponent(p.mailBody)}`;
+const gallery = ['tartare-bread', 'fritters-salad', 'mushrooms', 'french-toast', 'caesar-salad'].map((s) => ig(s));
+---
+
+<BaseLayout lang={lang} title={c.meta.cateringTitle} description={c.meta.cateringDescription} routeKey="catering">
+  <Hero slot="hero" variant="page" lang={lang} routeKey="catering" image={photos.kitchenPlating} alt={p.heroAlt} eyebrow={p.eyebrow} title={p.title} position="50% 45%" />
+
+  <section class="cat-intro section grain" aria-labelledby="cat-intro-title">
+    <div class="blob cat-intro__blob" aria-hidden="true"></div>
+    <div class="container cat-intro__grid">
+      <div class="cat-intro__text">
+        <h2 id="cat-intro-title" class="h2" data-split="chars" set:html={p.title} />
+        <p class="lead" data-reveal>{p.intro}</p>
+        <div data-reveal>
+          <p class="eyebrow eyebrow--plain cat-intro__occ-title">{p.occasionsTitle}</p>
+          <ul class="cat-intro__occasions">
+            {p.occasions.map((o) => <li class="tag">{o}</li>)}
+          </ul>
+        </div>
+        <div class="btn-row" data-reveal>
+          <Button href={mailto} icon="send" iconFirst magnetic>{p.send}</Button>
+          <Button href={site.phoneHref} variant="ghost" icon="phone" iconFirst>{phoneFor(lang)}</Button>
+        </div>
+      </div>
+      <figure class="cat-intro__photo frame" data-reveal>
+        <div class="cat-intro__parallax" data-parallax="-6">
+          <Picture src={photos.cateringSpread} alt={p.galleryAlt} formats={['avif', 'webp']} widths={[480, 720]} sizes="(max-width: 860px) 92vw, 40vw" loading="lazy" />
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="cat-steps section bg-sand grain" aria-labelledby="cat-steps-title">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{p.eyebrow}</p>
+        <h2 id="cat-steps-title" class="h2" data-split="chars" set:html={p.stepsTitle} />
+      </div>
+      <ol class="cat-steps__list">
+        {
+          p.steps.map((s, i) => (
+            <li class="cat-step" data-reveal>
+              <span class="cat-step__num">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="cat-step__title">{s.title}</h3>
+              <p>{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <Marquee lang={lang} />
+
+  <section class="cat-gallery section" aria-label={p.galleryAlt}>
+    <div class="container cat-gallery__grid">
+      {
+        gallery.map((g, i) => (
+          <figure class:list={['frame', 'cat-gallery__item', `cat-gallery__item--${i}`]} data-reveal>
+            <Picture src={g.src} alt={tx(g.alt, lang)} formats={['avif', 'webp']} widths={[320, 480, 640].filter((w) => w <= g.src.width)} sizes="(max-width: 860px) 46vw, 24vw" loading="lazy" />
+          </figure>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="cat-cta section bg-sand grain" aria-labelledby="cat-cta-title">
+    <div class="container--narrow cat-cta__inner">
+      <span class="mark mark--frog cat-cta__frog" aria-hidden="true"></span>
+      <h2 id="cat-cta-title" class="h2" data-split="chars" set:html={p.ctaTitle} />
+      <p class="lead" data-reveal>{p.ctaBody}</p>
+      <div class="btn-row cat-cta__actions" data-reveal>
+        <Button href={mailto} icon="send" iconFirst magnetic>{p.send}</Button>
+        <Button href={site.phoneHref} variant="ghost" icon="phone" iconFirst>{c.common.call}</Button>
+      </div>
+      <p class="cat-cta__mail" data-reveal>
+        <a class="link" href={`mailto:${site.email}`}>{site.email}</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .cat-intro {
+    overflow: clip;
+  }
+
+  .cat-intro__blob {
+    top: -10vw;
+    right: -16vw;
+    --blob-size: 54vw;
+  }
+
+  .cat-intro__grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(2.5rem, 7vw, 7rem);
+    align-items: center;
+  }
+
+  .cat-intro__text {
+    display: grid;
+    gap: 1.75rem;
+    justify-items: start;
+  }
+
+  .cat-intro__occ-title {
+    margin-bottom: 0.85rem;
+  }
+
+  .cat-intro__occasions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .cat-intro__photo {
+    margin: 0;
+    aspect-ratio: 3 / 4;
+  }
+
+  .cat-intro__parallax {
+    position: absolute;
+    inset: -8% 0;
+  }
+
+  .cat-intro__parallax :global(picture),
+  .cat-intro__parallax :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .cat-intro__parallax :global(img) {
+    object-fit: cover;
+  }
+
+  .cat-steps__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    counter-reset: step;
+  }
+
+  .cat-step {
+    display: grid;
+    align-content: start;
+    gap: 0.85rem;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition:
+      border-color 0.3s,
+      translate 0.4s var(--ease-out);
+  }
+
+  .cat-step:hover {
+    border-color: var(--line-strong);
+    translate: 0 -4px;
+  }
+
+  .cat-step__num {
+    color: var(--sage-deep);
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-style: italic;
+    font-weight: 340;
+    line-height: 1;
+  }
+
+  .cat-step__title {
+    font-size: 1.5rem;
+    font-weight: 420;
+  }
+
+  .cat-gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-auto-rows: clamp(120px, 14vw, 220px);
+    gap: clamp(0.5rem, 1.2vw, 1rem);
+  }
+
+  .cat-gallery__item {
+    margin: 0;
+  }
+
+  .cat-gallery__item :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s var(--ease-out);
+  }
+
+  .cat-gallery__item:hover :global(img) {
+    transform: scale(1.05);
+  }
+
+  .cat-gallery__item--0 {
+    grid-column: 1 / span 2;
+    grid-row: span 2;
+  }
+
+  .cat-gallery__item--1 {
+    grid-column: 3 / span 2;
+  }
+
+  .cat-gallery__item--2 {
+    grid-column: 5 / span 2;
+    grid-row: span 2;
+  }
+
+  .cat-gallery__item--3 {
+    grid-column: 3 / span 1;
+  }
+
+  .cat-gallery__item--4 {
+    grid-column: 4 / span 1;
+  }
+
+  .cat-cta__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .cat-cta__frog {
+    height: 96px;
+    color: var(--ink);
+  }
+
+  .cat-cta__actions {
+    justify-content: center;
+  }
+
+  @media (max-width: 860px) {
+    .cat-intro__grid,
+    .cat-steps__list {
+      grid-template-columns: 1fr;
+    }
+
+    .cat-intro__photo {
+      aspect-ratio: 4 / 3;
+    }
+
+    .cat-gallery__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: 42vw;
+    }
+
+    .cat-gallery__item--0,
+    .cat-gallery__item--1,
+    .cat-gallery__item--2,
+    .cat-gallery__item--3,
+    .cat-gallery__item--4 {
+      grid-column: auto;
+      grid-row: auto;
+    }
+
+    .cat-gallery__item--0 {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

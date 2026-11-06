@@ -1,0 +1,133 @@
+---
+import { Picture } from 'astro:assets';
+import Button from './Button.astro';
+import { copy } from '../i18n/copy';
+import { href, tx, formatPrice, type Lang } from '../i18n/utils';
+import { teaserItems, allergenLabels } from '../data/menu';
+import { ig } from '../data/images';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = copy[lang];
+const photo = ig('sardines-salsa-verde');
+const priceOf = (p: number | [number, number]) => (Array.isArray(p) ? `${formatPrice(p[0], lang)} / ${formatPrice(p[1], lang)}` : formatPrice(p, lang));
+---
+
+<section class="teaser section bg-sand grain" aria-labelledby="teaser-title">
+  <div class="container teaser__grid">
+    <div class="teaser__menu">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{c.teaser.eyebrow}</p>
+        <h2 id="teaser-title" class="h2" data-split="chars" set:html={c.teaser.title} />
+        <p class="lead" data-reveal>{c.teaser.body}</p>
+      </div>
+
+      <ul class="menu-list">
+        {
+          teaserItems.map((item) => (
+            <li class="menu-row" data-reveal>
+              <span class="menu-row__name">{tx(item.name, lang)}</span>
+              <span class="menu-row__price">{priceOf(item.price)}</span>
+              {item.allergens && (
+                <span class="menu-row__meta">{item.allergens.map((a) => tx(allergenLabels[a], lang)).join(' · ')}</span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="teaser__actions" data-reveal>
+        <Button href={href('menu', lang)} icon="arrow-right" magnetic>{c.common.fullMenu}</Button>
+        <p class="teaser__allergens">{c.common.allergensNote}</p>
+      </div>
+    </div>
+
+    <figure class="teaser__photo" data-reveal>
+      <div class="frame teaser__frame">
+        <div class="teaser__parallax" data-parallax="-6">
+          <Picture src={photo.src} alt={c.teaser.imageAlt} formats={['avif', 'webp']} widths={[480, 633]} sizes="(max-width: 860px) 92vw, 40vw" loading="lazy" />
+        </div>
+      </div>
+      <figcaption class="hand teaser__note">{c.teaser.note}</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .teaser__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(3rem, 7vw, 7rem);
+    align-items: center;
+  }
+
+  .teaser__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    margin-top: 2.25rem;
+  }
+
+  .teaser__allergens {
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+  }
+
+  .teaser__photo {
+    position: relative;
+    margin: 0;
+  }
+
+  .teaser__frame {
+    aspect-ratio: 3 / 4;
+  }
+
+  .teaser__parallax {
+    position: absolute;
+    inset: -8% 0;
+  }
+
+  .teaser__parallax :global(picture),
+  .teaser__parallax :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .teaser__parallax :global(img) {
+    object-fit: cover;
+  }
+
+  .teaser__note {
+    position: absolute;
+    left: -1.5rem;
+    bottom: 2rem;
+    padding: 0.4rem 0.9rem 0.5rem;
+    background: var(--surface);
+    border-radius: 999px;
+    box-shadow: var(--shadow-tile);
+    rotate: -6deg;
+  }
+
+  @media (max-width: 860px) {
+    .teaser__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .teaser__photo {
+      order: -1;
+      max-width: 520px;
+    }
+
+    .teaser__frame {
+      aspect-ratio: 4 / 3;
+    }
+
+    .teaser__note {
+      left: 0.75rem;
+      bottom: -1rem;
+    }
+  }
+</style>

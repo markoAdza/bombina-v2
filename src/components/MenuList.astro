@@ -1,0 +1,46 @@
+---
+import { copy } from '../i18n/copy';
+import { tx, formatPrice, type Lang } from '../i18n/utils';
+import { allergenLabels, type MenuItem } from '../data/menu';
+
+interface Props {
+  lang: Lang;
+  items: MenuItem[];
+}
+const { lang, items } = Astro.props;
+const m = copy[lang].menuPage;
+const priceOf = (p: MenuItem['price']) =>
+  Array.isArray(p) ? `${formatPrice(p[0], lang)} / ${formatPrice(p[1], lang)}` : formatPrice(p, lang);
+---
+
+<ul class="menu-list">
+  {
+    items.map((item) => (
+      <li class="menu-row" data-reveal>
+        <span class="menu-row__name">{tx(item.name, lang)}</span>
+        <span class="menu-row__price">
+          {priceOf(item.price)}
+          {Array.isArray(item.price) && <span class="menu-row__sizes">{m.small} / {m.large}</span>}
+        </span>
+        {item.allergens && item.allergens.length > 0 && (
+          <span class="menu-row__chips">
+            <span class="visually-hidden">{m.allergens}:</span>
+            {item.allergens.map((a) => (
+              <span class="chip">{tx(allergenLabels[a], lang)}</span>
+            ))}
+          </span>
+        )}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .menu-row__sizes {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: right;
+  }
+</style>

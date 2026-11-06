@@ -1,0 +1,160 @@
+---
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/fraunces/opsz-italic.css';
+import '@fontsource-variable/dm-sans/wght.css';
+import '@fontsource-variable/caveat/wght.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/components.css';
+
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { copy } from '../i18n/copy';
+import { routes, htmlLang, type Lang, type RouteKey } from '../i18n/utils';
+import { site, hours, hoursConfirmed } from '../data/site';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  routeKey: RouteKey | null;
+  /** absolute path of an OG image in /public */
+  ogImage?: string;
+  structuredData?: boolean;
+}
+
+const { lang, title, description, routeKey, ogImage = '/og-image.jpg', structuredData = false } = Astro.props;
+const c = copy[lang];
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const alternates = routeKey
+  ? (Object.keys(routes[routeKey]) as Lang[]).map((l) => ({ lang: l, href: new URL(routes[routeKey][l], Astro.site).href }))
+  : [];
+
+const jsonLd = structuredData
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Restaurant',
+      name: site.name,
+      url: site.url,
+      image: new URL(ogImage, Astro.site).href,
+      telephone: site.phoneIntl.replace(/\s/g, ''),
+      email: site.email,
+      servesCuisine: ['Slovenian', 'European', 'Seasonal'],
+      priceRange: '€€',
+      acceptsReservations: 'True',
+      menu: new URL(routes.menu[lang], Astro.site).href,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: site.address.street,
+        postalCode: site.address.postalCode,
+        addressLocality: site.address.city,
+        addressCountry: site.address.country,
+      },
+      sameAs: [site.instagram, site.facebook],
+      ...(hoursConfirmed
+        ? {
+            openingHoursSpecification: hours
+              .filter((h) => h.opens)
+              .map((h) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: h.schemaDays, opens: h.opens, closes: h.closes })),
+          }
+        : {}),
+    }
+  : null;
+---
+
+<!doctype html>
+<html lang={htmlLang(lang)}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={htmlLang(a.lang)} href={a.href} />)}
+    {routeKey && <link rel="alternate" hreflang="x-default" href={new URL(routes[routeKey].sl, Astro.site)} />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <!-- meta values can't read CSS variables: mirrors --bg in tokens.css -->
+    <meta name="theme-color" content="#F7F2EA" />
+
+    <meta property="og:type" content="restaurant" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang === 'sl' ? 'sl_SI' : 'en_GB'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preload" href="/brand/wordmark-bombina.svg" as="image" type="image/svg+xml" />
+
+    <script is:inline>
+      // Hide-then-reveal states only apply when motion will actually run (failsafe after 3.5s).
+      (function () {
+        var d = document.documentElement;
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          d.classList.add('motion-ok');
+          setTimeout(function () {
+            if (!window.__bombinaMotion) d.classList.remove('motion-ok');
+          }, 3500);
+        }
+      })();
+    </script>
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{c.common.skip}</a>
+
+    <!-- .page stacks above the sticky reveal footer; it also bounds the sticky hero -->
+    <div class="page">
+      <slot name="hero" />
+
+      <Nav lang={lang} routeKey={routeKey} />
+
+      <main id="main" class="curtain" tabindex="-1">
+        <div class="curtain__sentinel" data-curtain-sentinel aria-hidden="true"></div>
+        <slot />
+      </main>
+    </div>
+
+    <Footer lang={lang} routeKey={routeKey} />
+
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .page {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* once the content fully covers the sticky hero, stop painting it */
+  [data-hero].is-covered {
+    visibility: hidden;
+  }
+
+  .curtain__sentinel {
+    height: 0;
+  }
+
+  /* The page content is a "curtain": it scrolls over the sticky hero and lifts off the reveal footer. */
+  .curtain {
+    position: relative;
+    z-index: 2;
+    background: var(--bg);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow: var(--shadow-curtain);
+    outline: none;
+    /* clip (not hidden) keeps position: sticky working inside */
+    overflow: clip;
+  }
+</style>

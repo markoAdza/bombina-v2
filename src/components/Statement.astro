@@ -1,0 +1,167 @@
+---
+import { Picture } from 'astro:assets';
+import Button from './Button.astro';
+import { copy } from '../i18n/copy';
+import { href, type Lang } from '../i18n/utils';
+import { photos } from '../data/images';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = copy[lang];
+---
+
+<section class="statement section grain" aria-labelledby="statement-title">
+  <div class="blob statement__blob" aria-hidden="true"></div>
+  <div class="blob blob--caramel statement__blob statement__blob--2" aria-hidden="true"></div>
+
+  <div class="container statement__inner">
+    <p class="eyebrow" data-reveal>{c.statement.eyebrow}</p>
+
+    <div class="statement__head">
+      <h2 id="statement-title" class="display statement__title" data-split="words" set:html={c.statement.title} />
+      <p class="hand-note statement__note" aria-hidden="true">
+        <svg viewBox="0 0 90 60" class="statement__arrow">
+          <path data-draw d="M84 8 C 62 2, 40 10, 30 26 C 22 38, 20 46, 10 52" />
+          <path data-draw d="M10 52 L 22 50 M 10 52 L 13 40" />
+        </svg>
+        <span class="hand" data-reveal>{c.statement.note}</span>
+      </p>
+    </div>
+
+    <div class="statement__cols">
+      <p class="lead" data-reveal>{c.statement.body}</p>
+      <div class="statement__aside" data-reveal>
+        <p>{c.statement.bistro}</p>
+      </div>
+    </div>
+
+    <figure class="statement__figure frame" data-reveal>
+      <div class="statement__parallax" data-parallax="-8">
+        <Picture
+          src={photos.kitchenPlating}
+          alt={c.statement.imageAlt}
+          formats={['avif', 'webp']}
+          widths={[640, 960, 1320, 1600, 1919]}
+          sizes="(max-width: 1400px) 92vw, 1320px"
+          loading="lazy"
+        />
+      </div>
+      <figcaption class="statement__cta">
+        <Button href={href('home', lang, 'about')} variant="light" icon="arrow-right" magnetic>{c.common.meetUs}</Button>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .statement {
+    overflow: clip;
+    padding-top: clamp(4rem, 9vw, 8rem);
+  }
+
+  .statement__blob {
+    top: -12vw;
+    right: -14vw;
+    --blob-size: 52vw;
+  }
+
+  .statement__blob--2 {
+    top: auto;
+    right: auto;
+    bottom: 10%;
+    left: -20vw;
+    --blob-size: 44vw;
+  }
+
+  .statement__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .statement__head {
+    position: relative;
+  }
+
+  .statement__title {
+    max-width: 15ch;
+  }
+
+  .statement__note {
+    position: absolute;
+    right: clamp(0rem, 6vw, 8rem);
+    bottom: -0.5rem;
+    transform: rotate(-6deg);
+  }
+
+  .statement__arrow {
+    width: 5rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .statement__cols {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+    margin-top: clamp(1rem, 3vw, 2.5rem);
+  }
+
+  .statement__aside {
+    padding-top: 0.4rem;
+    padding-left: clamp(1rem, 2vw, 1.75rem);
+    border-left: 1px solid var(--caramel);
+    color: var(--ink-muted);
+  }
+
+  .statement__figure {
+    margin: clamp(1.5rem, 4vw, 3.5rem) 0 0;
+    aspect-ratio: 16 / 7;
+  }
+
+  .statement__parallax {
+    position: absolute;
+    inset: -10% 0;
+  }
+
+  .statement__parallax :global(picture),
+  .statement__parallax :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .statement__parallax :global(img) {
+    object-fit: cover;
+    object-position: 50% 55%;
+  }
+
+  .statement__cta {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1rem, 3vw, 2.25rem);
+    transform: translateX(-50%);
+  }
+
+  @media (max-width: 860px) {
+    .statement__cols {
+      grid-template-columns: 1fr;
+    }
+
+    .statement__note {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      margin-top: 0.5rem;
+      margin-left: auto;
+      width: max-content;
+      display: flex;
+    }
+
+    .statement__figure {
+      aspect-ratio: 4 / 5;
+    }
+  }
+</style>

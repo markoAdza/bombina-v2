@@ -1,0 +1,272 @@
+---
+import Icon from './Icon.astro';
+import LangToggle from './LangToggle.astro';
+import FrogEasterEgg from './FrogEasterEgg.astro';
+import { copy } from '../i18n/copy';
+import { href, type Lang, type RouteKey } from '../i18n/utils';
+import { site, hoursShort, phoneFor } from '../data/site';
+
+interface Props {
+  lang: Lang;
+  routeKey: RouteKey | null;
+}
+const { lang, routeKey } = Astro.props;
+const c = copy[lang];
+const year = new Date().getFullYear();
+const links = [
+  { label: c.common.menu, href: href('menu', lang) },
+  { label: c.common.catering, href: href('catering', lang) },
+  { label: c.common.about, href: href('home', lang, 'about') },
+  { label: c.common.visit, href: href('home', lang, 'visit') },
+];
+---
+
+<footer class="footer grain" data-footer>
+  <div class="footer__inner">
+    <a class="footer__mark-link" href={href('home', lang)} aria-label={`${site.name} — ${c.common.home}`}>
+      <span class="mark mark--bombina footer__mark" aria-hidden="true"></span>
+    </a>
+
+    <div class="footer__cols">
+      <div class="footer__col">
+        <h2 class="footer__label">{c.footer.contact}</h2>
+        <a class="footer__link footer__link--big" href={site.phoneHref}>{phoneFor(lang)}</a>
+        <a class="footer__link" href={`mailto:${site.email}`}>{site.email}</a>
+        <div class="footer__social">
+          <a class="footer__icon" href={site.instagram} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${site.instagramHandle}`}>
+            <Icon name="instagram" />
+          </a>
+          <a class="footer__icon" href={site.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <Icon name="facebook" />
+          </a>
+        </div>
+      </div>
+
+      <div class="footer__col footer__col--center">
+        <FrogEasterEgg lang={lang} />
+        <h2 class="footer__label">{c.footer.find}</h2>
+        <address>
+          <a class="footer__link" href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
+            {site.address.street}<br />{site.address.postalCode} {site.address.city}
+          </a>
+        </address>
+        <p class="footer__hours">{hoursShort[lang]}</p>
+      </div>
+
+      <div class="footer__col footer__col--right">
+        <h2 class="footer__label">{c.footer.explore}</h2>
+        <ul class="footer__nav">
+          {
+            links.map((l) => (
+              <li>
+                <a class="footer__link" href={l.href}>
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <LangToggle lang={lang} routeKey={routeKey} tone="light" />
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} {site.name}. {c.footer.rights}</p>
+      <p class="hand footer__wall">{c.footer.wall}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 0;
+    background-color: var(--caramel-deep);
+    color: var(--on-dark);
+  }
+
+  .footer.is-static {
+    position: relative;
+  }
+
+  .footer__inner {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    padding: calc(var(--radius-lg) + clamp(1.5rem, 3vw, 2.5rem)) var(--gutter) max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .footer__mark-link {
+    display: block;
+    color: var(--on-dark);
+    border-radius: 8px;
+  }
+
+  .footer__mark-link:focus-visible {
+    outline: 2px solid var(--on-dark);
+    outline-offset: 6px;
+  }
+
+  .footer__mark {
+    width: 100%;
+  }
+
+  /* short laptop screens: keep the footer shorter than the viewport so the reveal still works */
+  @media (min-width: 761px) and (max-height: 860px) {
+    .footer__inner {
+      gap: 1.5rem;
+    }
+
+    .footer__mark {
+      width: min(100%, 28svh * 3.975);
+      margin-inline: auto;
+    }
+  }
+
+  .footer__cols {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .footer__col {
+    display: grid;
+    gap: 0.35rem;
+    justify-items: start;
+  }
+
+  .footer__col--center {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .footer__col--right {
+    justify-items: end;
+    text-align: right;
+  }
+
+  .footer__label {
+    margin-bottom: 0.5rem;
+    color: var(--on-dark);
+    font: 600 var(--fs-label) / 1.2 var(--font-body);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .footer address {
+    font-style: normal;
+  }
+
+  .footer__link {
+    display: inline-block;
+    padding-block: 0.3rem;
+    color: var(--on-dark);
+    text-decoration: none;
+    background: linear-gradient(currentColor, currentColor) 0 calc(100% - 0.15rem) / 0 1px no-repeat;
+    transition: background-size 0.45s var(--ease-out);
+  }
+
+  .footer__link:hover {
+    background-size: 100% 1px;
+  }
+
+  .footer__link:focus-visible,
+  .footer__icon:focus-visible {
+    outline: 2px solid var(--on-dark);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .footer__link--big {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.1rem);
+    font-weight: 380;
+  }
+
+  .footer__social {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .footer__icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(var(--bg-rgb), 0.45);
+    border-radius: 999px;
+    color: var(--on-dark);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  }
+
+  .footer__icon:hover {
+    background: var(--on-dark);
+    border-color: var(--on-dark);
+    color: var(--caramel-deep);
+  }
+
+  .footer__hours {
+    margin-top: 0.35rem;
+    color: var(--on-dark);
+    font-size: 0.875rem;
+  }
+
+  .footer__nav {
+    display: grid;
+    justify-items: end;
+    margin-bottom: 0.5rem;
+  }
+
+  .footer__nav .footer__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    min-width: 44px;
+    justify-content: flex-end;
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(var(--bg-rgb), 0.28);
+    color: var(--on-dark);
+    font-size: 0.875rem;
+  }
+
+  .footer__wall {
+    color: var(--on-dark);
+    font-size: 1.5rem;
+  }
+
+  @media (max-width: 760px) {
+    .footer__cols {
+      grid-template-columns: 1fr;
+      gap: 2.25rem;
+    }
+
+    .footer__col,
+    .footer__col--right {
+      justify-items: center;
+      text-align: center;
+    }
+
+    .footer__col--center {
+      order: -1;
+    }
+
+    .footer__nav {
+      justify-items: center;
+    }
+
+    .footer__bottom {
+      justify-content: center;
+      text-align: center;
+    }
+  }
+</style>

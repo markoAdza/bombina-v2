@@ -1,0 +1,221 @@
+---
+import { Picture } from 'astro:assets';
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+import MapFacade from './MapFacade.astro';
+import { copy } from '../i18n/copy';
+import { anchorId, tx, type Lang } from '../i18n/utils';
+import { photos } from '../data/images';
+import { site, hours, hoursConfirmed, phoneFor } from '../data/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = copy[lang];
+---
+
+<section id={anchorId('visit', lang)} class="visit section bg-sand grain" aria-labelledby="visit-title">
+  <div class="container">
+    <div class="visit__head">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{c.visit.eyebrow}</p>
+        <h2 id="visit-title" class="h2 visit__title" data-split="chars" set:html={c.visit.title} />
+        <p class="hand visit__note" data-reveal>{c.visit.note}</p>
+      </div>
+      <figure class="visit__photo frame" data-reveal>
+        <Picture src={photos.wallMural} alt={c.visit.imageAlt} formats={['avif', 'webp']} widths={[480, 720, 960]} sizes="(max-width: 860px) 92vw, 34vw" loading="lazy" />
+      </figure>
+    </div>
+
+    <div class="visit__grid">
+      <div class="visit__info">
+        <div class="info-card" data-reveal>
+          <h3 class="info-card__title"><Icon name="map-pin" />{c.visit.address}</h3>
+          <address>
+            {site.name}<br />
+            {site.address.street}<br />
+            {site.address.postalCode} {site.address.city}, {lang === 'sl' ? 'Slovenija' : 'Slovenia'}
+          </address>
+          <a class="link-arrow" href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
+            <span>{c.common.directions}</span>
+            <Icon name="arrow-right" />
+          </a>
+        </div>
+
+        <div class="info-card" data-reveal>
+          <h3 class="info-card__title"><Icon name="phone" />{c.visit.contact}</h3>
+          <p>
+            <a class="info-card__big" href={site.phoneHref}>{phoneFor(lang)}</a>
+            <a class="link" href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
+          <div class="btn-row">
+            <Button href={site.phoneHref} icon="phone" iconFirst size="sm" magnetic>{c.common.call}</Button>
+            <Button href={`mailto:${site.email}`} variant="ghost" icon="mail" iconFirst size="sm">{c.common.email}</Button>
+          </div>
+        </div>
+
+        <div class="info-card" data-reveal>
+          <h3 class="info-card__title"><Icon name="clock" />{c.visit.hours}</h3>
+          <table class="hours">
+            <tbody>
+              {
+                hours.map((h) => (
+                  <tr>
+                    <th scope="row">{tx(h.days, lang)}</th>
+                    <td class:list={[!h.time && 'is-closed']}>{h.time ?? c.common.closed}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+          {!hoursConfirmed && <p class="info-card__note">{c.common.hoursNote}</p>}
+        </div>
+      </div>
+
+      <div class="visit__map" data-reveal>
+        <MapFacade lang={lang} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visit__head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  .visit__head .section-head {
+    margin-bottom: 0;
+  }
+
+  .visit__title {
+    max-width: 16ch;
+  }
+
+  .visit__note {
+    rotate: -3deg;
+    transform-origin: left;
+  }
+
+  .visit__photo {
+    margin: 0;
+    aspect-ratio: 3 / 2;
+  }
+
+  .visit__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: stretch;
+  }
+
+  .visit__info {
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .info-card {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .info-card__title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ink-muted);
+    font: 600 var(--fs-label) / 1.2 var(--font-body);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .info-card__title :global(.icon) {
+    color: var(--sage-deep);
+  }
+
+  .info-card address {
+    color: var(--ink);
+    font-style: normal;
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  .info-card p {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .info-card__big {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.2rem + 1.5vw, 2.5rem);
+    font-weight: 380;
+    line-height: 1.1;
+    text-decoration: none;
+  }
+
+  .info-card__big:hover {
+    color: var(--sage-deep);
+  }
+
+  .info-card__big:focus-visible {
+    outline: 2px solid var(--sage-deep);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .hours {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .hours th,
+  .hours td {
+    padding-block: 0.55rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+
+  .hours th {
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  .hours td {
+    color: var(--ink);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .hours td.is-closed {
+    color: var(--ink-muted);
+    font-weight: 400;
+  }
+
+  .info-card__note {
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+  }
+
+  .visit__map {
+    min-height: 420px;
+  }
+
+  @media (max-width: 960px) {
+    .visit__head,
+    .visit__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

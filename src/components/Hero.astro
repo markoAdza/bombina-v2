@@ -1,0 +1,332 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+import LangToggle from './LangToggle.astro';
+import { copy } from '../i18n/copy';
+import { href, type Lang, type RouteKey } from '../i18n/utils';
+import { site, phoneFor } from '../data/site';
+
+interface Props {
+  lang: Lang;
+  routeKey: RouteKey | null;
+  image: ImageMetadata;
+  alt: string;
+  variant?: 'home' | 'page';
+  /** page variant only */
+  eyebrow?: string;
+  title?: string;
+  position?: string;
+}
+
+const { lang, routeKey, image, alt, variant = 'home', eyebrow, title, position = '50% 50%' } = Astro.props;
+const c = copy[lang];
+const widths = [480, 768, 1024, 1366, 1600, 1919].filter((w) => w <= image.width);
+---
+
+<section class:list={['hero', `hero--${variant}`]} data-hero aria-label={variant === 'home' ? site.name : eyebrow}>
+  <div class="hero__media" data-hero-media>
+    <Picture
+      src={image}
+      alt={alt}
+      formats={['avif', 'webp']}
+      widths={widths}
+      sizes="100vw"
+      priority
+      class="hero__img"
+      style={`object-position:${position}`}
+    />
+  </div>
+  <div class="hero__shade" data-hero-shade aria-hidden="true"></div>
+
+  <div class="hero__top">
+    <p class="hero__place" data-hero-fade>{c.hero.place}</p>
+    <div class="hero__actions" data-hero-fade>
+      {routeKey !== 'menu' && <a class="hero__link" href={href('menu', lang)}>{c.common.menu}</a>}
+      <LangToggle lang={lang} routeKey={routeKey} tone="light" />
+      <Button href={site.phoneHref} variant="ghost-light" size="sm" icon="phone" iconFirst class="hero__cta" aria-label={`${c.common.reserve}: ${phoneFor(lang)}`}>
+        {c.common.reserve}
+      </Button>
+    </div>
+  </div>
+
+  <div class="hero__bottom">
+    {
+      variant === 'home' ? (
+        <>
+          <div class="hero__meta" data-hero-fade>
+            <span class="mark mark--bistro hero__bistro" aria-hidden="true" />
+            <p class="hero__tagline">{c.hero.tagline}</p>
+            <a class="hero__scroll" href="#main">
+              {c.common.scroll}
+              <Icon name="arrow-down" />
+            </a>
+          </div>
+          <h1 class="hero__title">
+            <span class="visually-hidden">{site.name} — Trbovlje</span>
+            <span class="hero__wordmark-wrap" data-hero-parallax>
+              <span class="mark mark--bombina hero__wordmark" aria-hidden="true" />
+            </span>
+          </h1>
+        </>
+      ) : (
+        <div class="hero__page-head">
+          {eyebrow && <p class="eyebrow hero__eyebrow" data-hero-fade>{eyebrow}</p>}
+          {title && <h1 class="display hero__page-title" data-hero-fade set:html={title} />}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    height: 100svh;
+    min-height: 520px;
+    overflow: hidden;
+    color: var(--on-dark);
+    background: var(--ink);
+  }
+
+  .hero--page {
+    height: 74vh;
+    height: 74svh;
+    min-height: 460px;
+  }
+
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 40%;
+  }
+
+  .hero__media :global(picture),
+  .hero__media :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero__media :global(img) {
+    object-fit: cover;
+    will-change: transform;
+  }
+
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(var(--ink-rgb), 0.45) 0%, rgba(var(--ink-rgb), 0) 22%),
+      linear-gradient(to top, rgba(var(--ink-rgb), 0.82) 0%, rgba(var(--ink-rgb), 0.35) 38%, rgba(var(--ink-rgb), 0) 64%);
+  }
+
+  .hero--page .hero__shade {
+    background:
+      linear-gradient(to bottom, rgba(var(--ink-rgb), 0.5) 0%, rgba(var(--ink-rgb), 0) 26%),
+      linear-gradient(to top, rgba(var(--ink-rgb), 0.85) 0%, rgba(var(--ink-rgb), 0.4) 45%, rgba(var(--ink-rgb), 0.08) 75%);
+  }
+
+  .hero__top,
+  .hero__bottom {
+    position: relative;
+    z-index: 1;
+    padding-inline: var(--gutter);
+  }
+
+  .hero__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: max(0.85rem, env(safe-area-inset-top));
+  }
+
+  .hero__place {
+    font: 600 var(--fs-label) / 1.2 var(--font-body);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .hero__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hero__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 0.5rem;
+    color: var(--on-dark);
+    text-decoration: none;
+    font: 600 var(--fs-label) / 1 var(--font-body);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: linear-gradient(currentColor, currentColor) 0.5rem calc(100% - 0.75rem) / 0 1px no-repeat;
+    transition: background-size 0.45s var(--ease-out);
+  }
+
+  .hero__link:hover {
+    background-size: calc(100% - 1rem) 1px;
+  }
+
+  .hero__bottom {
+    padding-bottom: clamp(1rem, 2.4vw, 2rem);
+  }
+
+  .hero__meta {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: end;
+    gap: clamp(1rem, 3vw, 3rem);
+    margin-bottom: clamp(0.75rem, 1.6vw, 1.5rem);
+  }
+
+  .hero__bistro {
+    height: clamp(26px, 3.2vw, 46px);
+  }
+
+  .hero__tagline {
+    max-width: 34ch;
+    color: rgba(var(--bg-rgb), 0.88);
+    font-size: clamp(0.9375rem, 0.85rem + 0.35vw, 1.125rem);
+    line-height: 1.45;
+  }
+
+  .hero__scroll {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    color: var(--on-dark);
+    text-decoration: none;
+    font: 600 var(--fs-label) / 1 var(--font-body);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .hero__scroll :global(.icon) {
+    animation: nudge 2.4s var(--ease-in-out) infinite;
+  }
+
+  .hero__scroll:focus-visible,
+  .hero__link:focus-visible {
+    outline: 2px solid var(--on-dark);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .hero__title {
+    color: var(--on-dark);
+    line-height: 0;
+  }
+
+  .hero__wordmark-wrap {
+    display: block;
+  }
+
+  .hero__wordmark {
+    width: 100%;
+  }
+
+  /* page variant */
+  .hero__page-head {
+    display: grid;
+    gap: 1rem;
+    max-width: 18ch;
+    padding-bottom: clamp(1rem, 4vw, 3rem);
+  }
+
+  .hero__eyebrow {
+    color: rgba(var(--bg-rgb), 0.85);
+  }
+
+  .hero__eyebrow::before {
+    background: var(--sage);
+  }
+
+  .hero__page-title {
+    color: var(--on-dark);
+  }
+
+  .hero__page-title :global(em) {
+    color: var(--sage);
+  }
+
+  /* ---- entrance (only when motion runs) ---- */
+  :global(html.motion-ok) .hero__wordmark {
+    clip-path: inset(100% 0 0 0);
+  }
+
+  :global(html.motion-ok) .hero__media :global(img) {
+    transform: scale(1.12);
+  }
+
+  :global(html.motion-ok) [data-hero-fade] {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  @keyframes nudge {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .hero__meta {
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'bistro scroll'
+        'tagline tagline';
+      row-gap: 0.75rem;
+    }
+
+    .hero__bistro {
+      grid-area: bistro;
+    }
+
+    .hero__scroll {
+      grid-area: scroll;
+    }
+
+    .hero__tagline {
+      grid-area: tagline;
+    }
+
+    .hero__place {
+      display: none;
+    }
+
+    .hero__top {
+      justify-content: flex-end;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .hero__actions :global(.hero__cta) {
+      width: 44px;
+      padding: 0;
+    }
+
+    .hero__actions :global(.hero__cta .btn__label) {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+</style>

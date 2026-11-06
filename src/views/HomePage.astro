@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Statement from '../components/Statement.astro';
+import Marquee from '../components/Marquee.astro';
+import StackedCards from '../components/StackedCards.astro';
+import Founders from '../components/Founders.astro';
+import MenuTeaser from '../components/MenuTeaser.astro';
+import Reviews from '../components/Reviews.astro';
+import InstagramCollage from '../components/InstagramCollage.astro';
+import Visit from '../components/Visit.astro';
+import { copy } from '../i18n/copy';
+import type { Lang } from '../i18n/utils';
+import { photos } from '../data/images';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = copy[lang];
+---
+
+<BaseLayout lang={lang} title={c.meta.homeTitle} description={c.meta.homeDescription} routeKey="home" structuredData>
+  <Hero
+    slot="hero"
+    lang={lang}
+    routeKey="home"
+    image={photos.heroTable}
+    alt={lang === 'sl' ? 'Roka postavlja skledo s sezonsko predjedjo na leseno mizo, ob njej goveji tatar, kruh in kozarci vina v toplem popoldanskem soncu.' : 'A hand sets down a bowl with a seasonal starter on a wooden table, next to beef tartare, bread and wine glasses in warm afternoon light.'}
+    position="62% 50%"
+  />
+  <Statement lang={lang} />
+  <Marquee lang={lang} />
+  <StackedCards lang={lang} />
+  <Founders lang={lang} />
+  <MenuTeaser lang={lang} />
+  <Reviews lang={lang} />
+  <InstagramCollage lang={lang} />
+  <Visit lang={lang} />
+</BaseLayout>

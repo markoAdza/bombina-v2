@@ -1,0 +1,193 @@
+---
+import { Picture } from 'astro:assets';
+import Button from './Button.astro';
+import { copy } from '../i18n/copy';
+import { anchorId, type Lang } from '../i18n/utils';
+import { photos, ig } from '../data/images';
+import { site } from '../data/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = copy[lang];
+const press = ig('coffee-press');
+---
+
+<section id={anchorId('about', lang)} class="founders section grain" aria-labelledby="founders-title">
+  <div class="blob founders__blob" aria-hidden="true"></div>
+  <div class="container founders__grid">
+    <div class="founders__visual">
+      <figure class="founders__photo frame" data-reveal>
+        <div class="founders__parallax" data-parallax="-6">
+          <Picture
+            src={photos.founders}
+            alt={c.founders.imageAlt}
+            formats={['avif', 'webp']}
+            widths={[480, 720, 960, 1279]}
+            sizes="(max-width: 860px) 92vw, 46vw"
+            loading="lazy"
+          />
+        </div>
+      </figure>
+
+      <figure class="founders__polaroid" data-reveal>
+        <div class="founders__polaroid-img">
+          <Picture src={press.src} alt={c.founders.pressAlt} formats={['avif', 'webp']} widths={[320, 480, 636]} sizes="220px" loading="lazy" />
+        </div>
+        <figcaption class="hand">{c.founders.pressNote}</figcaption>
+      </figure>
+    </div>
+
+    <div class="founders__text">
+      <p class="eyebrow" data-reveal>{c.founders.eyebrow}</p>
+      <h2 id="founders-title" class="h2" data-split="chars" set:html={c.founders.title} />
+      <div class="prose" data-reveal>
+        {c.founders.body.map((p) => <p>{p}</p>)}
+      </div>
+
+      <blockquote class="founders__quote" data-reveal>
+        <svg class="founders__quote-mark" viewBox="0 0 40 32" aria-hidden="true">
+          <path d="M0 32V19.2C0 8.5 5.6 1.9 16.8 0l1.6 4.2C12 6 9 9.6 8.6 15H16v17H0Zm22 0V19.2C22 8.5 27.6 1.9 38.8 0l1.6 4.2C34 6 31 9.6 30.6 15H38v17H22Z" />
+        </svg>
+        <p>{c.founders.quote}</p>
+        <footer>— {c.founders.quoteBy}</footer>
+      </blockquote>
+
+      <div class="btn-row" data-reveal>
+        <Button href={site.phoneHref} icon="phone" iconFirst magnetic>{c.common.reserveLong}</Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .founders {
+    overflow: clip;
+  }
+
+  .founders__blob {
+    top: 10%;
+    left: -18vw;
+    --blob-size: 56vw;
+  }
+
+  .founders__grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(3rem, 7vw, 7rem);
+    align-items: center;
+  }
+
+  .founders__visual {
+    position: relative;
+    padding-bottom: clamp(2rem, 6vw, 4rem);
+  }
+
+  .founders__photo {
+    margin: 0;
+    aspect-ratio: 4 / 5;
+  }
+
+  .founders__parallax {
+    position: absolute;
+    inset: -8% 0;
+  }
+
+  .founders__parallax :global(picture),
+  .founders__parallax :global(img) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .founders__parallax :global(img) {
+    object-fit: cover;
+    object-position: 50% 35%;
+  }
+
+  .founders__polaroid {
+    position: absolute;
+    right: clamp(-2rem, -3vw, -1rem);
+    bottom: 0;
+    width: clamp(150px, 17vw, 230px);
+    margin: 0;
+    padding: 0.6rem 0.6rem 0.4rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: var(--shadow-tile);
+    rotate: 5deg;
+    transition: rotate 0.6s var(--ease-out);
+  }
+
+  .founders__polaroid:hover {
+    rotate: 1deg;
+  }
+
+  .founders__polaroid-img {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+
+  .founders__polaroid-img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .founders__polaroid figcaption {
+    padding-top: 0.35rem;
+    text-align: center;
+    font-size: 1.35rem;
+  }
+
+  .founders__text {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+  }
+
+  .founders__quote {
+    position: relative;
+    margin: 0.5rem 0 0;
+    padding: 1.5rem 0 0 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .founders__quote-mark {
+    width: 28px;
+    margin-bottom: 0.75rem;
+    fill: var(--sage);
+  }
+
+  .founders__quote p {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1rem + 0.8vw, 1.6rem);
+    font-style: italic;
+    font-weight: 340;
+    line-height: 1.35;
+    max-width: 36ch;
+  }
+
+  .founders__quote footer {
+    margin-top: 0.85rem;
+    color: var(--ink-muted);
+    font: 600 var(--fs-label) / 1.2 var(--font-body);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 860px) {
+    .founders__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .founders__polaroid {
+      right: 0.5rem;
+    }
+  }
+</style>

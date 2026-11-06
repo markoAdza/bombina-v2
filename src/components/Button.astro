@@ -1,0 +1,46 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'ghost' | 'light' | 'ghost-light' | 'sage';
+  size?: 'md' | 'sm';
+  icon?: 'arrow-right' | 'phone' | 'mail' | 'map-pin' | 'instagram' | 'send' | 'calendar' | 'map';
+  iconFirst?: boolean;
+  magnetic?: boolean;
+  external?: boolean;
+  type?: 'button' | 'submit';
+  class?: string;
+  'aria-label'?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  iconFirst = false,
+  magnetic = false,
+  external = false,
+  type = 'button',
+  class: cls,
+  ...rest
+} = Astro.props;
+
+const label = await Astro.slots.render('default');
+const classes = ['btn', variant !== 'primary' && `btn--${variant}`, size === 'sm' && 'btn--sm', magnetic && 'magnetic', cls];
+const Tag = href ? 'a' : 'button';
+const linkAttrs = href
+  ? { href, ...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {}) }
+  : { type };
+---
+
+<Tag class:list={classes} {...linkAttrs} {...rest}>
+  {icon && iconFirst && <Icon name={icon} />}
+  <span class="btn__label">
+    <span set:html={label} />
+    <span aria-hidden="true" set:html={label} />
+  </span>
+  {icon && !iconFirst && <Icon name={icon} />}
+</Tag>

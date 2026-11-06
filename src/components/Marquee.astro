@@ -1,0 +1,92 @@
+---
+import { copy } from '../i18n/copy';
+import type { Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const items = copy[lang].marquee;
+---
+
+<div class="marquee" data-marquee role="presentation">
+  <p class="visually-hidden">{items.join(' · ')}</p>
+  <div class="marquee__track" data-marquee-track aria-hidden="true">
+    {
+      [0, 1].map(() => (
+        <div class="marquee__group">
+          {items.map((item, i) => (
+            <>
+              <span class:list={['marquee__item', i % 2 === 1 && 'marquee__item--italic']}>{item}</span>
+              <svg class="marquee__star" viewBox="0 0 40 40">
+                <path d="M20 2c1.4 9.6 8.4 16.6 18 18-9.6 1.4-16.6 8.4-18 18-1.4-9.6-8.4-16.6-18-18 9.6-1.4 16.6-8.4 18-18Z" />
+              </svg>
+            </>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .marquee {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(1.25rem, 3vw, 2.5rem);
+    border-block: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee 42s linear infinite;
+  }
+
+  /* JS (GSAP) takes over to follow scroll velocity */
+  :global(html.motion-ok) .marquee.is-driven .marquee__track {
+    animation: none;
+  }
+
+  .marquee__group {
+    display: flex;
+    align-items: center;
+    flex: none;
+  }
+
+  .marquee__item {
+    padding-inline: clamp(1rem, 2.5vw, 2.25rem);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 1.5rem + 5.5vw, 7.5rem);
+    font-weight: 330;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  .marquee__item--italic {
+    font-style: italic;
+    color: var(--sage-deep);
+  }
+
+  .marquee__star {
+    flex: none;
+    width: clamp(1.5rem, 3vw, 2.75rem);
+    height: auto;
+    fill: var(--sage);
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+</style>

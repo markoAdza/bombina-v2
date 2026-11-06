@@ -1,0 +1,203 @@
+---
+import { copy } from '../i18n/copy';
+import type { Lang } from '../i18n/utils';
+import { reviews } from '../data/reviews';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = copy[lang];
+
+const items = reviews.map((r, i) => {
+  const useTranslation = r.lang !== lang && !!r.translation;
+  const text = useTranslation ? r.translation! : r.text;
+  const note = useTranslation ? c.common.translated : r.lang !== lang ? c.common.original : null;
+  return { ...r, i, text, note, short: text.length < 180, long: text.length > 320, quoteLang: useTranslation ? lang : r.lang };
+});
+---
+
+<section class="reviews section grain" aria-labelledby="reviews-title">
+  <div class="container">
+    <div class="section-head reviews__head">
+      <p class="eyebrow" data-reveal>{c.reviews.eyebrow}</p>
+      <h2 id="reviews-title" class="h2" data-split="chars" set:html={c.reviews.title} />
+    </div>
+
+    <ul class="reviews__grid">
+      {
+        items.map((r) => (
+          <li class:list={['review', r.short && 'review--short', `review--${r.i}`]} data-reveal>
+            <svg class="review__mark" viewBox="0 0 40 32" aria-hidden="true">
+              <path d="M0 32V19.2C0 8.5 5.6 1.9 16.8 0l1.6 4.2C12 6 9 9.6 8.6 15H16v17H0Zm22 0V19.2C22 8.5 27.6 1.9 38.8 0l1.6 4.2C34 6 31 9.6 30.6 15H38v17H22Z" />
+            </svg>
+            <blockquote class="review__quote" lang={r.quoteLang === 'sl' ? 'sl' : 'en'}>
+              <p id={`review-text-${r.i}`} class:list={['review__text', r.long && 'is-clamped']}>
+                {r.text}
+              </p>
+            </blockquote>
+            {r.long && (
+              <button class="review__more" type="button" aria-expanded="false" aria-controls={`review-text-${r.i}`} data-review-toggle data-more={c.common.readMore} data-less={c.common.readLess}>
+                {c.common.readMore}
+              </button>
+            )}
+            <footer class="review__foot">
+              <span class="review__author">{r.author}</span>
+              <span class="review__source">
+                {c.common.googleReview}
+                {r.note && <> · {r.note}</>}
+              </span>
+            </footer>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="reviews__source" data-reveal>{c.reviews.source}</p>
+  </div>
+</section>
+
+<style>
+  .reviews__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    align-items: start;
+  }
+
+  .review {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition:
+      border-color 0.3s,
+      box-shadow 0.4s var(--ease-out),
+      translate 0.4s var(--ease-out);
+  }
+
+  .review:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-subtle);
+    translate: 0 -4px;
+  }
+
+  .review--0 {
+    grid-column: 1 / span 5;
+    background: var(--sage-soft);
+  }
+
+  .review--1 {
+    grid-column: 6 / span 7;
+  }
+
+  .review--2 {
+    grid-column: 1 / span 7;
+  }
+
+  .review--3 {
+    grid-column: 8 / span 5;
+    background: var(--surface-alt);
+  }
+
+  .review__mark {
+    width: 30px;
+    fill: var(--sage);
+  }
+
+  .review--0 .review__mark {
+    fill: var(--sage-deep);
+  }
+
+  .review__quote {
+    margin: 0;
+  }
+
+  .review__text {
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+
+  .review--short .review__text {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 1rem + 1.2vw, 2rem);
+    font-weight: 360;
+    line-height: 1.3;
+  }
+
+  .review__text.is-clamped {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+    line-clamp: 6;
+    overflow: hidden;
+  }
+
+  .review.is-expanded .review__text.is-clamped {
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    display: block;
+  }
+
+  .review__more {
+    align-self: flex-start;
+    min-height: 44px;
+    color: var(--sage-deep);
+    font: 600 var(--fs-label) / 1 var(--font-body);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  .review__more:hover {
+    color: var(--ink);
+  }
+
+  .review__more:focus-visible {
+    outline: 2px solid var(--sage-deep);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .review__foot {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .review__author {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .review__source {
+    color: var(--ink-muted);
+    font-size: 0.8125rem;
+  }
+
+  .review--0 .review__source {
+    color: var(--ink-soft);
+  }
+
+  .reviews__source {
+    margin-top: 1.5rem;
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+    text-align: right;
+  }
+
+  @media (max-width: 960px) {
+    .review--0,
+    .review--1,
+    .review--2,
+    .review--3 {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

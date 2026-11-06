@@ -1,0 +1,32 @@
+{
+  "name": "bombina-v2",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bistro Bombina — restaurant website (Trbovlje, Slovenia)",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "assets": "node scripts/prepare-assets.mjs",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/caveat": "^5.3.0",
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "astro": "~7.3.8",
+    "gsap": "^3.15.1",
+    "lenis": "^1.3.27"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "sharp": "^0.35.5",
+    "typescript": "^5.9.3"
+  }
+}

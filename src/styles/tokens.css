@@ -1,0 +1,103 @@
+/* ==========================================================================
+   Bistro Bombina — design tokens (see DESIGN.md §2–§7)
+   The ONLY file allowed to contain raw colour values.
+   ========================================================================== */
+:root {
+  /* Backgrounds */
+  --bg: #F7F2EA;
+  --surface: #FFFDF9;
+  --surface-alt: #EFE7DA;
+  --surface-hover: #F2EBDF;
+  --beige: #E4D6C1;
+
+  /* Borders */
+  --line: #D8CCBA;
+  --line-strong: #A8906C;
+
+  /* Text */
+  --ink: #1E1A15;
+  --ink-soft: #4A433A;
+  --ink-muted: #6F665A;
+  --on-dark: #F7F2EA;
+
+  /* Accent: sage pistachio */
+  --sage: #B7C3A0;
+  --sage-soft: #DDE3D1;
+  --sage-deep: #5F6E4A;
+  --accent: var(--sage-deep);
+  --accent-hover: var(--ink);
+
+  /* Warm neutrals */
+  --caramel: #A8906C;
+  --caramel-deep: #7A6347;
+
+  /* RGB helpers */
+  --bg-rgb: 247, 242, 234;
+  --surface-rgb: 255, 253, 249;
+  --ink-rgb: 30, 26, 21;
+  --sage-rgb: 183, 195, 160;
+  --sage-deep-rgb: 95, 110, 74;
+  --caramel-rgb: 168, 144, 108;
+  --caramel-deep-rgb: 122, 99, 71;
+
+  /* Semantic */
+  --success: #5F6E4A;
+  --error: #A2462F;
+  --warning: #B8862F;
+
+  /* Typography */
+  --font-display: 'Fraunces Variable', 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-body: 'DM Sans Variable', 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-hand: 'Caveat Variable', 'Caveat', 'Segoe Print', 'Bradley Hand', cursive;
+
+  --fs-statement: clamp(2.5rem, 1.2rem + 5.2vw, 5.75rem);
+  --fs-h2: clamp(2.25rem, 1.4rem + 3.6vw, 4.25rem);
+  --fs-h3: clamp(2rem, 1.3rem + 2.4vw, 3.25rem);
+  --fs-h4: 1.25rem;
+  --fs-lead: clamp(1.125rem, 1rem + 0.4vw, 1.3125rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-label: 0.75rem;
+  --fs-button: 0.8125rem;
+  --fs-hand: clamp(1.5rem, 1.2rem + 1vw, 2.125rem);
+
+  /* Layout */
+  --container: 1320px;
+  --container-narrow: 760px;
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --section-y: clamp(4.5rem, 10vw, 9rem);
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+  --space-6: 4.5rem;
+  --space-7: 7rem;
+
+  /* Navigation */
+  --nav-bar-h: 72px;
+  --nav-strip-h: 36px;
+  --nav-h: calc(var(--nav-bar-h) + var(--nav-strip-h));
+
+  /* Shape & depth */
+  --radius: 8px;
+  --radius-lg: 28px;
+  --shadow-subtle: 0 1px 0 rgba(var(--ink-rgb), 0.04), 0 8px 24px -12px rgba(var(--ink-rgb), 0.18);
+  --shadow-stack: 0 -18px 40px -24px rgba(var(--ink-rgb), 0.28);
+  --shadow-tile: 0 18px 40px -18px rgba(var(--ink-rgb), 0.35);
+  --shadow-curtain: 0 40px 80px -40px rgba(var(--ink-rgb), 0.45);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Paper grain (alpha noise tile, scrolls with content: no blend-mode cost) */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .12 0 0 0 0 .1 0 0 0 0 .08 0 0 0 .55 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --nav-bar-h: 64px;
+    --nav-strip-h: 34px;
+  }
+}

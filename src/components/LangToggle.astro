@@ -1,0 +1,72 @@
+---
+import { copy } from '../i18n/copy';
+import { routes, type Lang, type RouteKey } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  routeKey: RouteKey | null;
+  tone?: 'ink' | 'light';
+}
+const { lang, routeKey, tone = 'ink' } = Astro.props;
+const other: Lang = lang === 'sl' ? 'en' : 'sl';
+const target = routes[routeKey ?? 'home'][other];
+const c = copy[lang].common;
+---
+
+<div class:list={['lang', `lang--${tone}`]}>
+  <span class="lang__current" aria-hidden="true">{lang.toUpperCase()}</span>
+  <span class="lang__sep" aria-hidden="true">/</span>
+  <a class="lang__link" href={target} hreflang={other} lang={other} aria-label={c.switchLangLabel} data-lang-switch={other}>
+    {c.switchLangShort}
+  </a>
+</div>
+
+<style>
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font: 600 var(--fs-label) / 1 var(--font-body);
+    letter-spacing: 0.14em;
+    color: var(--ink-muted);
+  }
+
+  .lang--light {
+    color: var(--on-dark);
+  }
+
+  .lang__current {
+    color: var(--ink);
+  }
+
+  .lang--light .lang__current {
+    color: var(--on-dark);
+  }
+
+  .lang__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 999px;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .lang__link:hover {
+    background: var(--sage-soft);
+    color: var(--ink);
+  }
+
+  .lang--light .lang__link:hover {
+    background: rgba(var(--bg-rgb), 0.18);
+    color: var(--on-dark);
+  }
+
+  .lang__link:focus-visible {
+    outline: 2px solid var(--sage-deep);
+    outline-offset: 2px;
+  }
+</style>

@@ -4,7 +4,6 @@ import type { ImageMetadata } from 'astro';
 import heroTable from '../assets/photos/hero-table.jpg';
 import duckMorels from '../assets/photos/duck-morels.jpg';
 import kitchenPlating from '../assets/photos/kitchen-plating.jpg';
-import wallMural from '../assets/photos/wall-mural.jpg';
 import founders from '../assets/photos/founders.jpg';
 import porkChopJus from '../assets/photos/pork-chop-jus.jpg';
 import roastBeef from '../assets/photos/roast-beef.jpg';
@@ -15,7 +14,6 @@ export const photos = {
   heroTable,
   duckMorels,
   kitchenPlating,
-  wallMural,
   founders,
   porkChopJus,
   roastBeef,
@@ -62,10 +60,3 @@ export const ig = (slug: string) => {
   if (!found) throw new Error(`Instagram photo "${slug}" not found in src/assets/instagram`);
   return found;
 };
-
-/** Collage order (first 8 used, falls back to whatever exists). */
-const collageOrder = ['seafood-tagliatelle', 'pad-thai', 'french-toast', 'tartare-bread', 'caesar-salad', 'mushrooms', 'semifreddo-dark', 'chicken-kiev'];
-export const collagePhotos: IgPhoto[] = [
-  ...collageOrder.map((s) => igPhotos.find((p) => p.slug === s)).filter((p): p is IgPhoto => !!p),
-  ...igPhotos.filter((p) => !collageOrder.includes(p.slug)),
-].slice(0, 8);

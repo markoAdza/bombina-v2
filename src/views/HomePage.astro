@@ -2,12 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import Statement from '../components/Statement.astro';
-import Marquee from '../components/Marquee.astro';
 import StackedCards from '../components/StackedCards.astro';
 import Founders from '../components/Founders.astro';
 import MenuTeaser from '../components/MenuTeaser.astro';
 import Reviews from '../components/Reviews.astro';
-import InstagramCollage from '../components/InstagramCollage.astro';
+import InstagramFeed from '../components/InstagramFeed.astro';
 import Visit from '../components/Visit.astro';
 import { copy } from '../i18n/copy';
 import type { Lang } from '../i18n/utils';
@@ -30,11 +29,10 @@ const c = copy[lang];
     position="62% 50%"
   />
   <Statement lang={lang} />
-  <Marquee lang={lang} />
   <StackedCards lang={lang} />
   <Founders lang={lang} />
   <MenuTeaser lang={lang} />
   <Reviews lang={lang} />
-  <InstagramCollage lang={lang} />
+  <InstagramFeed lang={lang} />
   <Visit lang={lang} />
 </BaseLayout>

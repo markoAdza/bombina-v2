@@ -1,11 +1,9 @@
 ---
-import { Picture } from 'astro:assets';
 import Button from './Button.astro';
 import Icon from './Icon.astro';
 import MapFacade from './MapFacade.astro';
 import { copy } from '../i18n/copy';
 import { anchorId, tx, type Lang } from '../i18n/utils';
-import { photos } from '../data/images';
 import { site, hours, hoursConfirmed, phoneFor } from '../data/site';
 
 interface Props {
@@ -17,15 +15,9 @@ const c = copy[lang];
 
 <section id={anchorId('visit', lang)} class="visit section bg-sand grain" aria-labelledby="visit-title">
   <div class="container">
-    <div class="visit__head">
-      <div class="section-head">
-        <p class="eyebrow" data-reveal>{c.visit.eyebrow}</p>
-        <h2 id="visit-title" class="h2 visit__title" data-split="chars" set:html={c.visit.title} />
-        <p class="hand visit__note" data-reveal>{c.visit.note}</p>
-      </div>
-      <figure class="visit__photo frame" data-reveal>
-        <Picture src={photos.wallMural} alt={c.visit.imageAlt} formats={['avif', 'webp']} widths={[480, 720, 960]} sizes="(max-width: 860px) 92vw, 34vw" loading="lazy" />
-      </figure>
+    <div class="section-head visit__head">
+      <p class="eyebrow" data-reveal>{c.visit.eyebrow}</p>
+      <h2 id="visit-title" class="h2 visit__title" data-split="chars" set:html={c.visit.title} />
     </div>
 
     <div class="visit__grid">
@@ -82,29 +74,11 @@ const c = copy[lang];
 
 <style>
   .visit__head {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: clamp(2rem, 6vw, 6rem);
-    align-items: end;
     margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
-  }
-
-  .visit__head .section-head {
-    margin-bottom: 0;
   }
 
   .visit__title {
     max-width: 16ch;
-  }
-
-  .visit__note {
-    rotate: -3deg;
-    transform-origin: left;
-  }
-
-  .visit__photo {
-    margin: 0;
-    aspect-ratio: 3 / 2;
   }
 
   .visit__grid {
@@ -213,7 +187,6 @@ const c = copy[lang];
   }
 
   @media (max-width: 960px) {
-    .visit__head,
     .visit__grid {
       grid-template-columns: 1fr;
     }

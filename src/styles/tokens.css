@@ -40,6 +40,13 @@
   --caramel-rgb: 168, 144, 108;
   --caramel-deep-rgb: 122, 99, 71;
 
+  /* Instagram brand (feed avatar ring + verified badge only) */
+  --ig-yellow: #FEDA75;
+  --ig-orange: #FA7E1E;
+  --ig-pink: #D62976;
+  --ig-purple: #962FBF;
+  --ig-blue: #0095F6;
+
   /* Semantic */
   --success: #5F6E4A;
   --error: #A2462F;

@@ -2,7 +2,7 @@
 
 > **Linen tablecloth, candlelight, a frog in a bow tie.** Fancy enough for a celebration, homey enough to come in without taking your shoes off ("Kr naprej, pa neč se sezuvat!").
 
-Reference: [yauya.si](https://yauya.si/), used for its sticky photo hero with a full-width wordmark, sticky stacked cards, Instagram parallax collage and reveal footer. Bombina takes those structures and improves on them (see §10).
+Reference: [yauya.si](https://yauya.si/), used for its sticky photo hero with a full-width wordmark, sticky stacked cards, Instagram feed (profile banner + post grid) and reveal footer. Bombina takes those structures and improves on them (see §10).
 
 ---
 
@@ -13,7 +13,7 @@ Reference: [yauya.si](https://yauya.si/), used for its sticky photo hero with a 
 **Tone**: refined, warm, personal, and a little playful (the frog), NOT corporate, NOT "luxury black & gold", NOT rustic-kitsch
 **Feel**: a menu printed on heavy cream paper with a handwritten note from the chef tucked inside.
 
-**Interaction Tier**: **L2: Flowing.** Sticky "curtain" hero, receding stacked cards, depth-parallax collage, scroll reveals, smooth scroll, and a nav that reacts to scroll.
+**Interaction Tier**: **L2: Flowing.** Sticky "curtain" hero, receding stacked cards, Instagram feed reveal, scroll reveals, smooth scroll, and a nav that reacts to scroll.
 **Dependencies**: `gsap` (+ `ScrollTrigger`, `SplitText`, both free since GSAP 3.13) · `lenis` · Fontsource (self-hosted fonts)
 
 **Brand assets**
@@ -225,11 +225,13 @@ All three families include Latin Extended (č, š, ž, ë).
 .menu-row__desc { grid-column: 1 / -1; color: var(--ink-muted); font-size: .9375rem; }
 ```
 
-### Instagram tile / Review card / Map facade
+### Instagram feed / Review card / Map facade
+The Instagram feed follows the yauya.si layout. A centered banner holds the avatar with the IG gradient ring, the name, @handle, posts/followers/following and a caramel-deep **Follow** button. Below it sits an edge-to-edge 4-column grid of square posts (2 columns at 640px and below) with no gaps. Each post has a white type badge top-right (instagram / carousel / reel). On hover or focus, a dark overlay fades in with likes and comments when known, plus the caption clamped to 5 lines. Data: `src/data/instagram.json` via `npm run instagram`.
 ```css
-.ig-tile { position: absolute; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-tile); }
-.ig-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease-out); }
-.ig-tile:hover img { transform: scale(1.06); }
+.ig-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ig-post { position: relative; aspect-ratio: 1; overflow: hidden; }
+.ig-post__overlay { position: absolute; inset: 0; background: rgba(var(--ink-rgb), .78); opacity: 0; transition: opacity .3s var(--ease-out); }
+.ig-post:hover .ig-post__overlay, .ig-post:focus-visible .ig-post__overlay { opacity: 1; }
 .review { padding: clamp(1.5rem, 3vw, 2.5rem); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); scroll-snap-align: start; transition: border-color .3s, transform .4s var(--ease-out); }
 .review:hover { border-color: var(--line-strong); transform: translateY(-4px); }
 .map-facade { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); background: var(--sage-soft); overflow: hidden; }
@@ -247,7 +249,7 @@ All three families include Latin Extended (č, š, ž, ë).
 - Section padding: `clamp(4.5rem, 10vw, 9rem)` block.
 - Component gap: `var(--space-4)`. Card internal padding: `clamp(1rem, 2vw, 1.5rem)`.
 
-**Page order (home)**: Hero (sticky curtain) → Nav (sticky) → Statement → Marquee → Stacked cards → Founders → Menu teaser → Reviews → Instagram → Visit → Reveal footer.
+**Page order (home)**: Hero (sticky curtain) → Nav (sticky) → Statement → Stacked cards → Founders → Menu teaser → Reviews → Instagram → Visit → Reveal footer.
 
 **Layering (the "curtain")**
 ```
@@ -274,7 +276,7 @@ body
 | Flat | 1px `--line` border, no shadow | menu sheets, info cards, chips |
 | Subtle | `--shadow-subtle: 0 1px 0 rgba(var(--ink-rgb), .04), 0 8px 24px -12px rgba(var(--ink-rgb), .18)` | stuck nav, hovered review |
 | Stack | `--shadow-stack: 0 -18px 40px -24px rgba(var(--ink-rgb), .28)` | sticky stacked cards (shadow cast upward onto previous card) |
-| Tile | `--shadow-tile: 0 18px 40px -18px rgba(var(--ink-rgb), .35)` | IG collage tiles |
+| Tile | `--shadow-tile: 0 18px 40px -18px rgba(var(--ink-rgb), .35)` | (unused since the collage was replaced) |
 | Curtain | `--shadow-curtain: 0 40px 80px -40px rgba(var(--ink-rgb), .45)` | bottom edge of `<main>` over the reveal footer |
 
 Atmosphere: a fixed **paper-grain** overlay (pre-rendered SVG `feTurbulence`, opacity .07, `mix-blend-mode: multiply`, `pointer-events: none`) and **soft blobs** (`radial-gradient` in `rgba(var(--sage-rgb), .35)` / `rgba(var(--caramel-rgb), .18)`) behind the statement, founders and Instagram sections.
@@ -332,32 +334,29 @@ The `motion-ok` class is set by an inline head script only when reduced motion i
 | `[data-draw]` SVG | enters 80% | `stroke-dashoffset len→0` | 1.4s, power2.inOut |
 | `[data-parallax]` | in view | `yPercent: ±n` | scrub |
 | Stacked cards | next card top → its sticky top | previous card `scale 1→.94`, `--dim 0→.28` | scrub |
-| IG collage | section in view | tile `yPercent` by depth (±12/22/34) | scrub |
-| Marquee | always | xPercent −50 loop; `timeScale` follows Lenis velocity, flips with scroll direction | 38s base |
+| IG feed | grid enters 85% | posts `y 28→0, opacity 0→1` | 1s expo.out, stagger .06, once |
 | Nav | scroll | `.is-stuck` after hero; `.is-compact` on scroll down, removed on scroll up | .45s |
 
 ### Hover & Focus States
 - Buttons: text-swap labels and a background change to sage-deep. Magnetic pull on `.magnetic` (max 10px, `(hover: hover)` only, rAF-throttled `quickTo`).
 - Nav links: underline wipe (left-in, right-out).
-- Cards and IG tiles: image `scale(1.04–1.06)` over .8–1.2s.
+- Cards: image `scale(1.04–1.06)` over .8–1.2s. IG posts: dark overlay with caption (no zoom, as on yauya).
 - Reviews: lift 4px and border to `--line-strong`.
 - Every interactive element: `:focus-visible { outline: 2px solid var(--sage-deep); outline-offset: 2–4px }`.
 
 ### Special Effects
 - **Text-swap button** (yauya's, refined with expo easing).
 - **Handwritten note + self-drawing arrow** next to the statement ("simpl ampak duobr").
-- **IG mouse drift**: on `(hover: hover)`, tiles' inner wrappers translate by `--mx/--my × depth` (rAF), independent of the GSAP scroll transform.
 - **Easter egg**: hovering, tapping or focusing the footer frog makes it bow (rotate -8° and back) and shows a speech bubble ("Dober tek!" / "Bon appétit!").
 
 ### Reduced Motion
 ```css
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-  .marquee__track { animation: none !important; transform: none !important; }
   .stack-card { position: relative; top: auto; }
 }
 ```
-JS also skips Lenis, all ScrollTriggers, the hero timeline and mouse drift. Content is fully visible with no hidden initial states.
+JS also skips Lenis, all ScrollTriggers, and the hero timeline. Content is fully visible with no hidden initial states.
 
 ## 8. Do's and Don'ts
 
@@ -387,7 +386,7 @@ JS also skips Lenis, all ScrollTriggers, the hero timeline and mouse drift. Cont
 **Breakpoints**
 | Name | Width | Key Changes |
 |------|-------|-------------|
-| Desktop | > 1024px | Two-tier nav with links left/right, stacked cards 2-col, IG collage with 8 tiles + mouse drift |
+| Desktop | > 1024px | Two-tier nav with links left/right, stacked cards 2-col, IG feed 4 columns |
 | Tablet | 601–1024px | Nav collapses to burger + centered frog, cards 2-col with smaller type, IG 6 tiles |
 | Mobile | ≤ 600px | Cards single column (image top 45%, text bottom), sticky offsets smaller, IG 5 tiles at 3 depths, footer columns stack |
 
@@ -413,6 +412,6 @@ JS also skips Lenis, all ScrollTriggers, the hero timeline and mouse drift. Cont
 | Hero | sticky 100svh photo, full-width svg logo, black gradient | Same curtain + Ken-Burns + clip-path wordmark reveal + scroll parallax | More "arrival" on load |
 | Nav | cream bar + caramel strip with white text | cream bar + **sage** strip with ink text | yauya strip fails contrast (2.7:1) |
 | Cards | static sticky stack, uppercase serif | stack **recedes** (scale + dim), tinted cards, index numbers, CTAs | Depth and clearer purpose |
-| Instagram | 7 static squares + Elfsight | 8 tiles with depth parallax + mouse drift + two-row marquee, no third party | Livelier, faster, GDPR-friendly |
+| Instagram | Elfsight widget: profile banner + post grid with hover overlay | Same layout, self-hosted snapshot (`npm run instagram`), no third-party script | Faster, GDPR-friendly |
 | Footer | caramel #af9978 + light beige text | caramel-deep #7A6347 + linen text, curtain shadow, frog easter egg | Contrast 5.1:1, delight |
 | Type | Lamore (all caps) + Volte | Fraunces (sentence case, italic accent) + DM Sans + Caveat notes | Homier, personal voice |

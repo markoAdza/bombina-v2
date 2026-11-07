@@ -22,7 +22,7 @@ type SectionKey = 'alacarte' | 'weekly' | 'desserts';
 const sections: { key: SectionKey; items: MenuItem[]; photo: { src: ImageMetadata; alt: string } }[] = [
   { key: 'alacarte', items: aLaCarte, photo: { src: ig('tartare-bread').src, alt: tx(ig('tartare-bread').alt, lang) } },
   { key: 'weekly', items: weekly, photo: { src: ig('seafood-tagliatelle').src, alt: tx(ig('seafood-tagliatelle').alt, lang) } },
-  { key: 'desserts', items: desserts, photo: { src: ig('semifreddo-dark').src, alt: tx(ig('semifreddo-dark').alt, lang) } },
+  { key: 'desserts', items: desserts, photo: { src: ig('french-toast').src, alt: tx(ig('french-toast').alt, lang) } },
 ];
 const tabs: { key: AnchorKey; label: string }[] = [
   { key: 'alacarte', label: m.tabs.alacarte },
@@ -34,7 +34,7 @@ const allergenKeys = Object.keys(allergenLabels) as Allergen[];
 ---
 
 <BaseLayout lang={lang} title={c.meta.menuTitle} description={c.meta.menuDescription} routeKey="menu">
-  <Hero slot="hero" variant="page" lang={lang} routeKey="menu" image={photos.roastBeef} alt={m.heroAlt} eyebrow={m.eyebrow} title={m.title} position="50% 55%" />
+  <Hero slot="hero" variant="page" lang={lang} routeKey="menu" image={photos.friedChicken} alt={m.heroAlt} eyebrow={m.eyebrow} title={m.title} position="50% 45%" />
 
   <section class="menu-intro section grain">
     <div class="container menu-intro__inner">

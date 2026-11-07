@@ -182,12 +182,35 @@ const widths = [480, 768, 1024, 1366, 1600, 1919].filter((w) => w <= image.width
     padding-bottom: clamp(1rem, 2.4vw, 2rem);
   }
 
+  /* Scrim that travels with the meta row + wordmark, so the small text above
+     BOMBINA stays readable however tall the wordmark makes the block. */
+  .hero--home .hero__bottom {
+    isolation: isolate;
+  }
+
+  .hero--home .hero__bottom::before {
+    content: '';
+    position: absolute;
+    inset: -16vh 0 0;
+    z-index: -1;
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--ink-rgb), 0) 0%,
+      rgba(var(--ink-rgb), 0.42) 14vh,
+      rgba(var(--ink-rgb), 0.58) 40%,
+      rgba(var(--ink-rgb), 0.72) 100%
+    );
+    pointer-events: none;
+  }
+
   .hero__meta {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: end;
     gap: clamp(1rem, 3vw, 3rem);
     margin-bottom: clamp(0.75rem, 1.6vw, 1.5rem);
+    /* on the parent: the BISTRO mark is a CSS mask, which would clip its own shadow */
+    filter: drop-shadow(0 1px 10px rgba(var(--ink-rgb), 0.5));
   }
 
   .hero__bistro {
@@ -196,9 +219,11 @@ const widths = [480, 768, 1024, 1366, 1600, 1919].filter((w) => w <= image.width
 
   .hero__tagline {
     max-width: 34ch;
-    color: rgba(var(--bg-rgb), 0.88);
+    color: var(--on-dark);
     font-size: clamp(0.9375rem, 0.85rem + 0.35vw, 1.125rem);
+    font-weight: 500;
     line-height: 1.45;
+    text-shadow: 0 1px 14px rgba(var(--ink-rgb), 0.6);
   }
 
   .hero__scroll {

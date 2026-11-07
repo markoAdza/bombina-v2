@@ -13,6 +13,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "assets": "node scripts/prepare-assets.mjs",
+    "instagram": "python scripts/instagram_snapshot.py",
     "astro": "astro"
   },
   "dependencies": {

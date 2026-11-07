@@ -1,0 +1,384 @@
+---
+import { Image, Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { copy } from '../i18n/copy';
+import type { Lang } from '../i18n/utils';
+import { igProfile, igFeed, formatCount } from '../data/instagram';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = copy[lang].instagram;
+const p = igProfile;
+const handle = `@${p.username}`;
+
+const stats = [
+  { value: p.posts, label: c.posts },
+  { value: p.followers, label: c.followers },
+  { value: p.following, label: c.following },
+];
+
+const posts = igFeed.map((post) => {
+  const caption = post.caption.replace(/\s+/g, ' ').trim();
+  const short = caption.length > 90 ? `${caption.slice(0, 88).trimEnd()}…` : caption;
+  return { ...post, caption, short };
+});
+const link = { target: '_blank', rel: 'noopener noreferrer' };
+---
+
+<section class="ig-feed" aria-labelledby="ig-feed-title">
+  <h2 id="ig-feed-title" class="visually-hidden">{c.heading}</h2>
+
+  <header class="ig-head" data-reveal>
+    <a class="ig-head__profile" href={p.url} {...link}>
+      <span class="ig-head__avatar">
+        {p.avatar ? <Image src={p.avatar} alt="" width={96} height={96} /> : <Icon name="instagram" />}
+      </span>
+      <span class="ig-head__names">
+        <span class="ig-head__name">
+          {p.fullName}
+          {p.verified && <Icon name="verified" class="ig-head__verified" label="Verified" />}
+        </span>
+        <span class="ig-head__handle">{handle}</span>
+      </span>
+    </a>
+
+    <ul class="ig-head__stats">
+      {
+        stats.map((s) => (
+          <li>
+            <strong>{formatCount(s.value, lang)}</strong>
+            <span>{s.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a class="ig-head__follow" href={p.url} {...link} aria-label={`${c.followLabel} (${handle})`}>
+      <Icon name="instagram" />
+      {c.follow}
+    </a>
+  </header>
+
+  <ul class="ig-grid" data-ig-grid>
+    {
+      posts.map((post) => (
+        <li data-ig-post>
+          <a class="ig-post" href={post.url} {...link} aria-label={`${c.openPost}${post.short ? `: ${post.short}` : ''}`}>
+            <Picture
+              src={post.src}
+              alt=""
+              formats={['avif', 'webp']}
+              widths={[320, 480, 640].filter((w) => w <= post.src.width)}
+              sizes="(max-width: 640px) 50vw, 25vw"
+              loading="lazy"
+              class="ig-post__img"
+            />
+            <span class="ig-post__badge" aria-hidden="true">
+              <Icon name={post.type === 'image' ? 'instagram' : post.type} />
+            </span>
+            <span class="ig-post__overlay" aria-hidden="true">
+              {(post.likes != null || post.comments != null) && (
+                <span class="ig-post__counts">
+                  {post.likes != null && (
+                    <span>
+                      <Icon name="heart" />
+                      {formatCount(post.likes, lang)}
+                    </span>
+                  )}
+                  {post.comments != null && (
+                    <span>
+                      <Icon name="comment" />
+                      {formatCount(post.comments, lang)}
+                    </span>
+                  )}
+                </span>
+              )}
+              {post.caption ? <span class="ig-post__caption">{post.caption}</span> : <Icon name="instagram" class="ig-post__glyph" />}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .ig-feed {
+    padding-block: clamp(2.5rem, 5vw, 3.5rem) clamp(3rem, 6vw, 5rem);
+    padding-inline: clamp(1rem, 1.3vw, 1.5rem);
+    background: var(--bg);
+  }
+
+  /* ---------------- Profile banner ---------------- */
+  .ig-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem clamp(1.5rem, 3vw, 2.75rem);
+    margin-bottom: clamp(1.5rem, 2.5vw, 2rem);
+    font-family: var(--font-body);
+  }
+
+  .ig-head__profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .ig-head__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 52px;
+    height: 52px;
+    padding: 2px;
+    border-radius: 50%;
+    /* Instagram story ring */
+    background: conic-gradient(from 200deg, var(--ig-yellow), var(--ig-orange), var(--ig-pink), var(--ig-purple), var(--ig-yellow));
+  }
+
+  .ig-head__avatar :global(img) {
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--bg);
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface);
+  }
+
+  .ig-head__names {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .ig-head__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .ig-head__name :global(.ig-head__verified) {
+    width: 16px;
+    height: 16px;
+    color: var(--ig-blue);
+  }
+
+  .ig-head__handle {
+    color: var(--ink-muted);
+    font-size: 0.8125rem;
+  }
+
+  .ig-head__profile:hover .ig-head__name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .ig-head__stats {
+    display: flex;
+    gap: clamp(1.25rem, 2.2vw, 1.75rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  .ig-head__stats li {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .ig-head__stats strong {
+    color: var(--ink);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+  }
+
+  .ig-head__stats span {
+    color: var(--ink-muted);
+    font-size: 0.75rem;
+  }
+
+  .ig-head__follow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: var(--on-dark);
+    background: var(--caramel-deep);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.25s var(--ease-out);
+  }
+
+  .ig-head__follow:hover {
+    background: var(--ink);
+  }
+
+  .ig-head__follow :global(.icon) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .ig-head__profile:focus-visible,
+  .ig-head__follow:focus-visible {
+    outline: 2px solid var(--sage-deep);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ---------------- Grid ---------------- */
+  .ig-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ig-post {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    color: var(--on-dark);
+    background: var(--beige);
+    text-decoration: none;
+  }
+
+  .ig-post :global(picture),
+  .ig-post :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ig-post :global(img) {
+    object-fit: cover;
+  }
+
+  .ig-post__badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    display: grid;
+    /* readable on white posts too (menus, posters) */
+    filter: drop-shadow(0 0 1px rgba(var(--ink-rgb), 0.7)) drop-shadow(0 1px 4px rgba(var(--ink-rgb), 0.45));
+  }
+
+  .ig-post__badge :global(.icon) {
+    width: 22px;
+    height: 22px;
+    stroke-width: 1.75;
+  }
+
+  .ig-post__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: clamp(1rem, 3vw, 2.5rem);
+    background: rgba(var(--ink-rgb), 0.78);
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-out);
+  }
+
+  .ig-post:hover .ig-post__overlay,
+  .ig-post:focus-visible .ig-post__overlay {
+    opacity: 1;
+  }
+
+  .ig-post:focus-visible {
+    outline: 3px solid var(--sage);
+    outline-offset: -3px;
+  }
+
+  .ig-post__counts {
+    display: flex;
+    gap: 2.25rem;
+    font-size: 1.0625rem;
+    font-weight: 500;
+  }
+
+  .ig-post__counts > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .ig-post__counts :global(.icon) {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ig-post__caption {
+    display: -webkit-box;
+    max-width: 34ch;
+    overflow: hidden;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
+  }
+
+  .ig-post__overlay :global(.ig-post__glyph) {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* touch screens never see the overlay; keep it out of the way */
+  @media (hover: none) {
+    .ig-post__overlay {
+      display: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .ig-post__caption {
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+      font-size: 0.875rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ig-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ig-head {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .ig-post__badge {
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+
+    .ig-post__badge :global(.icon) {
+      width: 18px;
+      height: 18px;
+    }
+  }
+</style>

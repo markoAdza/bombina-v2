@@ -42,11 +42,17 @@ Prices are plain numbers (`12` or `[6.5, 9.5]` for small/large). They render as 
 
 ## Photos
 
-- **Instagram photos:** drop images into `./instagram/` (git-ignored), then run:
+- **Instagram feed (home page):** the profile banner (posts, followers, following) and the 8 newest posts come straight from the public [@bombinabistro](https://www.instagram.com/bombinabistro/) profile. To refresh them, run:
+  ```bash
+  npm run instagram   # python scripts/instagram_snapshot.py (needs: pip install playwright && python -m playwright install chromium)
+  npm run build
+  ```
+  The script opens the profile in headless Chromium. It writes `src/data/instagram.json` and the images in `src/assets/instagram-feed/`, and saves a screenshot to `.asset-cache/instagram/profile.png` so you can check the numbers. Instagram hides like and comment counts from logged-out visitors. To show them in the hover overlay, type them into `instagram.json` (`"likes": 123, "comments": 4`). A refresh keeps them. If Instagram ever shows a login wall, the script stops and leaves the existing data alone.
+- **Instagram photos used elsewhere** (menu page, cards, founders): drop images into `./instagram/` (git-ignored), then run:
   ```bash
   node scripts/prepare-assets.mjs instagram
   ```
-  They're converted into `src/assets/instagram/` and appear automatically in the Instagram marquee. The first eight also fill the collage, in the order set in `src/data/images.ts`. For carousel screenshots with arrow buttons, add a `trim` entry in `scripts/prepare-assets.mjs`.
+  They're converted into `src/assets/instagram/`. Pick them by name with `ig('slug')` from `src/data/images.ts`. For carousel screenshots with arrow buttons, add a `trim` entry in `scripts/prepare-assets.mjs`.
 - **Original-resolution photos** look sharper than Instagram screenshots (about 640px wide). If the bistro has the originals, replace the files in `src/assets/instagram/` or `src/assets/photos/` and keep the same file names.
 - Astro generates responsive AVIF/WebP versions at build time.
 
@@ -58,7 +64,7 @@ Prices are plain numbers (`12` or `[6.5, 9.5]` for small/large). They render as 
 src/
   pages/        thin SL/EN routes → views/
   views/        HomePage, MenuPage, CateringPage
-  components/   Hero, Nav, StackedCards, InstagramCollage, Visit, Footer, …
+  components/   Hero, Nav, StackedCards, InstagramFeed, Visit, Footer, …
   layouts/      BaseLayout (SEO, hreflang, JSON-LD, fonts, curtain structure)
   scripts/      ui.ts (always), motion.ts (GSAP + Lenis, loaded only without reduced motion)
   styles/       tokens.css (the only file with colour values), base.css, components.css
@@ -67,7 +73,7 @@ src/
 public/brand/   vector wordmark + frog (used as CSS masks so they recolour via tokens)
 ```
 
-- **Motion (L2):** a sticky "curtain" hero, scroll-velocity marquee, receding stacked cards, a depth-parallax Instagram collage, split-text headlines, magnetic buttons and a reveal footer. Everything degrades to a static, fully visible page under `prefers-reduced-motion`. Sticky effects switch themselves off on screens too small to show them fully.
+- **Motion (L2):** a sticky "curtain" hero, receding stacked cards, an Instagram feed that rises in row by row, split-text headlines, magnetic buttons and a reveal footer. Everything degrades to a static, fully visible page under `prefers-reduced-motion`. Sticky effects switch themselves off on screens too small to show them fully.
 - **Privacy:** fonts are self-hosted and the Instagram images are local. The Google map is click-to-load, so nothing third-party loads until the visitor asks for it.
 - **Easter egg:** say hello to the frog waiter in the footer.
 

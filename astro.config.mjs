@@ -18,4 +18,11 @@ export default defineConfig({
   ],
   build: { inlineStylesheets: 'auto' },
   devToolbar: { enabled: false },
+  vite: {
+    // motion.ts is lazy-loaded, so Vite would only discover these deps on first visit and
+    // re-optimise mid-session (504 "Outdated Optimize Dep" → motion fails → no scroll reveals).
+    optimizeDeps: {
+      include: ['gsap', 'gsap/ScrollTrigger', 'gsap/SplitText', 'lenis'],
+    },
+  },
 });

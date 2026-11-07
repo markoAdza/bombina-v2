@@ -3,7 +3,6 @@ import { Picture } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import Button from '../components/Button.astro';
-import Marquee from '../components/Marquee.astro';
 import { copy } from '../i18n/copy';
 import { tx, type Lang } from '../i18n/utils';
 import { photos, ig } from '../data/images';
@@ -66,8 +65,6 @@ const gallery = ['tartare-bread', 'fritters-salad', 'mushrooms', 'french-toast',
       </ol>
     </div>
   </section>
-
-  <Marquee lang={lang} />
 
   <section class="cat-gallery section" aria-label={p.galleryAlt}>
     <div class="container cat-gallery__grid">

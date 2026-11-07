@@ -159,73 +159,17 @@ function stack() {
   });
 }
 
-/** Text marquee whose speed + direction follow the scroll. */
-function marquee() {
-  $$('[data-marquee]').forEach((mq) => {
-    const track = mq.querySelector('[data-marquee-track]');
-    if (!track) return;
-    mq.classList.add('is-driven');
-    const tween = gsap.to(track, { xPercent: -50, duration: 42, ease: 'none', repeat: -1 });
-    tween.totalTime(tween.duration() * 200); // room to run "backwards" when scrolling up
-    let speed: gsap.core.Timeline | null = null;
-    ScrollTrigger.create({
-      trigger: mq,
-      start: 'top bottom',
-      end: 'bottom top',
-      onToggle: (self) => tween.paused(!self.isActive),
-      onUpdate(self) {
-        const direction = self.direction;
-        const boost = Math.min(Math.abs(self.getVelocity()) / 350, 5);
-        speed?.kill();
-        speed = gsap
-          .timeline()
-          .to(tween, { timeScale: direction * (1 + boost), duration: 0.2, ease: 'power1.out' })
-          .to(tween, { timeScale: direction, duration: 1.2, ease: 'power2.out' });
-      },
-    });
-  });
-}
-
-/** Instagram collage: depth parallax + gentle mouse drift. */
+/** Instagram feed: tiles rise in, row by row. */
 function instagram() {
-  const stage = document.querySelector<HTMLElement>('[data-ig-stage]');
-  if (!stage) return;
-  const tiles = $$<HTMLElement>('[data-ig-tile]', stage);
-  const amp = isSmall() ? 0.45 : 1;
-
-  gsap.from(tiles, {
-    scale: 0.82,
+  const grid = document.querySelector<HTMLElement>('[data-ig-grid]');
+  if (!grid) return;
+  gsap.from($$<HTMLElement>('[data-ig-post]', grid), {
     opacity: 0,
-    duration: 1.3,
+    y: 28,
+    duration: 1,
     ease: 'expo.out',
-    stagger: { each: 0.07, from: 'center' },
-    scrollTrigger: { trigger: stage, start: 'top 75%', once: true },
-  });
-
-  tiles.forEach((tile) => {
-    const depth = Number(tile.dataset.depth ?? 2);
-    const y = (4 - depth) * 9 * amp;
-    gsap.fromTo(tile, { yPercent: y }, { yPercent: -y, ease: 'none', scrollTrigger: { trigger: stage, start: 'top bottom', end: 'bottom top', scrub: 0.6 } });
-  });
-
-  if (!canHover) return;
-  let raf = 0;
-  let mx = 0;
-  let my = 0;
-  stage.addEventListener('pointermove', (e) => {
-    const r = stage.getBoundingClientRect();
-    mx = ((e.clientX - r.left) / r.width - 0.5) * 2;
-    my = ((e.clientY - r.top) / r.height - 0.5) * 2;
-    if (raf) return;
-    raf = requestAnimationFrame(() => {
-      stage.style.setProperty('--mx', mx.toFixed(3));
-      stage.style.setProperty('--my', my.toFixed(3));
-      raf = 0;
-    });
-  });
-  stage.addEventListener('pointerleave', () => {
-    stage.style.setProperty('--mx', '0');
-    stage.style.setProperty('--my', '0');
+    stagger: 0.06,
+    scrollTrigger: { trigger: grid, start: 'top 85%', once: true },
   });
 }
 
@@ -257,7 +201,6 @@ export function initMotion() {
   draws();
   parallax();
   stack();
-  marquee();
   instagram();
   magnetic();
 

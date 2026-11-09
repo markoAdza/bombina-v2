@@ -33,7 +33,6 @@ const sl = {
     switchLangLabel: 'Switch to English',
     reservations: 'Rezervacije',
     closed: 'Zaprto',
-    hoursNote: 'Delovni čas se lahko spremeni — za rezervacijo nas raje pokličite.',
     allergensNote: 'Za informacije o alergenih vprašajte naše osebje.',
     scroll: 'Drsi',
     seeMenu: 'Poglej meni',
@@ -147,7 +146,6 @@ const sl = {
     contact: 'Rezervacije in kontakt',
     hours: 'Delovni čas',
     mapButton: 'Prikaži zemljevid',
-    mapConsent: 'Zemljevid naloži Google Maps (piškotki tretjih oseb).',
     mapTitle: 'Zemljevid: Bistro Bombina, Ulica 1. junija 8, Trbovlje',
   },
   footer: {
@@ -240,7 +238,6 @@ const en: Copy = {
     switchLangLabel: 'Preklopi na slovenščino',
     reservations: 'Reservations',
     closed: 'Closed',
-    hoursNote: 'Opening hours may vary — please call us to book.',
     allergensNote: 'Please ask our staff for allergen information.',
     scroll: 'Scroll',
     seeMenu: 'See the menu',
@@ -354,7 +351,6 @@ const en: Copy = {
     contact: 'Reservations & contact',
     hours: 'Opening hours',
     mapButton: 'Show map',
-    mapConsent: 'The map is loaded from Google Maps (third-party cookies).',
     mapTitle: 'Map: Bistro Bombina, Ulica 1. junija 8, Trbovlje',
   },
   footer: {
